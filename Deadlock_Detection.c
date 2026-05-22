@@ -1,0 +1,62 @@
+#include <stdio.h>
+
+int main() {
+    int n, m;
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+    printf("Enter number of resources: ");
+    scanf("%d", &m);
+
+    int alloc[n][m], request[n][m], avail[m];
+    int finish[n], work[m];
+
+    printf("Enter allocation matrix:\n");
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            scanf("%d", &alloc[i][j]);
+
+    printf("Enter request matrix:\n");
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            scanf("%d", &request[i][j]);
+
+    printf("Enter available resources:\n");
+    for (int i = 0; i < m; i++)
+        scanf("%d", &avail[i]);
+
+    for (int i = 0; i < m; i++) work[i] = avail[i];
+    for (int i = 0; i < n; i++) finish[i] = 0;
+
+    int deadlock = 0;
+    while (1) {
+        int found = 0;
+        for (int i = 0; i < n; i++) {
+            if (!finish[i]) {
+                int j;
+                for (j = 0; j < m; j++)
+                    if (request[i][j] > work[j])
+                        break;
+
+                if (j == m) {
+                    for (int k = 0; k < m; k++)
+                        work[k] += alloc[i][k];
+                    finish[i] = 1;
+                    found = 1;
+                }
+            }
+        }
+        if (!found) break;
+    }
+
+    for (int i = 0; i < n; i++) {
+        if (!finish[i]) {
+            deadlock = 1;
+            printf("Process P%d is in deadlock.\n", i);
+        }
+    }
+
+    if (!deadlock)
+        printf("No deadlock detected.\n");
+
+    return 0;
+}
